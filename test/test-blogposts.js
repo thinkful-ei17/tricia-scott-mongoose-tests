@@ -67,19 +67,19 @@ describe('GET make sure fields match', function() {
       .get('/posts')
       .then(function(res) {
         res.should.be.status(200);
-        res.body.forEach(function(blogPost){
+        res.body.forEach(function(blogPost) {
           blogPost.should.be.a('object');
           blogPost.should.include.keys('id', 'author', 'content', 'title', 'created');
         });
       });
-  });//end it statement
+  }); //end it statement
 }); //end describe for GET
 
-describe('POST endpoint', function(){
+describe('POST endpoint', function() {
 
-  it('should add a new blogPost', function(){
+  it('should add a new blogPost', function() {
     // const newBlogPost = seedData[0]
-    const newPost = seedData[0];                   
+    const newPost = seedData[0];
 
     return chai.request(app)
       .post('/posts')
@@ -96,5 +96,33 @@ describe('POST endpoint', function(){
         res.body.content.should.equal(newPost.content);
         res.body.title.should.equal(newPost.title);
       });
-  });//closes it block
-});//closes describe block
+  }); //closes it block
+}); //closes describe block
+
+//PUT Operation
+describe('PUT: modify a blog post', function() {
+  it('should modify a blog post', function() {
+
+    const updatePost = {
+      title: 'Magic Time',
+      content: 'This is the content for Magic Time',
+    };
+
+    return BlogPost.findOne()
+      .then(post => {
+        updatePost.id = post.id;
+        //makes request then inspect it.
+        return chai.request(app)
+          .put(`/posts/${updatePost.id}`)
+          .send(updatePost);
+      })
+      .then(res => {
+        res.should.have.status(204);
+        return BlogPost.findById(updatePost.id);
+      })
+      .then(post => {
+        post.title.should.equal(updatePost.title);
+        post.content.should.equal(updatePost.content);
+      });
+  }); //end it
+}); //end describe
