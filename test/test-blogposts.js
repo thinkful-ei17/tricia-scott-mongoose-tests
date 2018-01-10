@@ -47,6 +47,7 @@ describe('GET: Checks that the get returns same number of entries as in the Blog
         response.should.be.json;
         response.body.should.be.a('array');
         response.body.length.should.be.at.least(1);
+        console.log('body length =', response.body.length);
         return BlogPost.count();
       })
       .then(function(count) {
@@ -58,15 +59,42 @@ describe('GET: Checks that the get returns same number of entries as in the Blog
 
 
 //GET endpoint test
-// describe('GET: Get objects in BlogDb', function() {
-//   it('should return all blog entries', function() {
-//     return chai.request(app)
-//     .get('/posts')
+describe('GET make sure fields match', function() {
 
+  it('should return blog entries with correct fields', function() {
+    let blogResponse;
+    return chai.request(app)
+      .get('/posts')
+      .then(function(res) {
+        res.should.be.status(200);
+        res.body.forEach(function(blogPost){
+          blogPost.should.be.a('object');
+          blogPost.should.include.keys('id', 'author', 'content', 'title', 'created');
+        });
+      });
+  });//end it statement
+}); //end describe for GET
 
-//   });//end it statement
-//   // it('should return all blog entries', function() {
-//   //   return true.should.be.true;
-//   // });
+describe('POST endpoint', function(){
 
-// }); //end describe for GET
+  it('should add a new blogPost', function(){
+    // const newBlogPost = seedData[0]
+    const newPost = seedData[0];                   
+
+    return chai.request(app)
+      .post('/posts')
+      .send(newPost)
+      .then(res => {
+        res.should.have.status(201);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        res.body.should.include.keys(
+          'id', 'author', 'content', 'title', 'created'
+        );
+        console.log('res author = ', res.body.author);
+        res.body.author.should.equal(newPost.author.firstName + ' ' + newPost.author.lastName);
+        res.body.content.should.equal(newPost.content);
+        res.body.title.should.equal(newPost.title);
+      });
+  });//closes it block
+});//closes describe block
