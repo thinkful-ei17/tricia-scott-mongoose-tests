@@ -126,3 +126,22 @@ describe('PUT: modify a blog post', function() {
       });
   }); //end it
 }); //end describe
+
+//Delete
+
+describe('DELETE: a blog post', function() {
+  it('Delete a blog post', function() {
+    let post;
+    return BlogPost.findOne()
+      .then(_post => {
+        post = _post.id;
+        return chai.request(app)
+          .delete(`/posts/${post}`)
+          .send(post);
+      })
+      .then(res => {
+        res.should.have.status(204);
+        return BlogPost.findById(post);
+      });
+  }); //end it
+}); //end describe
